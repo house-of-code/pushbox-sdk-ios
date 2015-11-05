@@ -23,7 +23,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     NSCAssert([(__bridge NSObject*) info isKindOfClass: [HoCPushBoxReachability class]], @"info was wrong class in ReachabilityCallback");
     
     HoCPushBoxReachability* noteObject = (__bridge HoCPushBoxReachability *)info;
-    NSLog(@"Hello: %@", noteObject);
     // Post a notification to notify the client that the network reachability changed.
     [[NSNotificationCenter defaultCenter] postNotificationName: HoCPushBoxReachabilityChangedNotification object: noteObject];
 }
