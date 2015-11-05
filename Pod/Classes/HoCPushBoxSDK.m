@@ -1,64 +1,64 @@
 //
-//  PushBoxSDK.m
-//  PushBox-sdk-ios
+//  HoCPushBoxSDK.m
+//  HoCPushBox-sdk-ios
 //
 //  Created by Gert Lavsen on 03/11/15.
 //  Copyright © 2015 House of Code. All rights reserved.
 //
 
-#import "HoCPushBoxSDK.h"
-#import "HoCPushBoxReachability.h"
+#import "HoCHoCPushBoxSDK.h"
+#import "HoCHoCPushBoxReachability.h"
 #import "NSString+HMAC.h"
 
 
 #pragma mark - string constants
 #pragma mark notifcations
-NSString * const PushBoxSDKNotificationSuccess = @"PushBoxSDK.successfull.note";
-NSString * const PushBoxSDKNotificationFailure = @"PushBoxSDK.successfull.note";
-NSString * const PushBoxSDKNotificationFailureReasonKey = @"PushBoxSDK.successfull.note.reason.key";
-NSString * const PushBoxSDKNotificationFailureCodeKey = @"PushBoxSDK.successfull.note.code.key";
+NSString * const HoCPushBoxSDKNotificationSuccess = @"HoCPushBoxSDK.successfull.note";
+NSString * const HoCPushBoxSDKNotificationFailure = @"HoCPushBoxSDK.successfull.note";
+NSString * const HoCPushBoxSDKNotificationFailureReasonKey = @"HoCPushBoxSDK.successfull.note.reason.key";
+NSString * const HoCPushBoxSDKNotificationFailureCodeKey = @"HoCPushBoxSDK.successfull.note.code.key";
 #pragma mark urls
-NSString * const PushBoxSDKApiUrl = @"http://api.pushboxsdk.com/v1/";
-NSString * const PushBoxSDKHost = @"api.pushboxsdk.com";
+NSString * const HoCPushBoxSDKApiUrl = @"http://api.pushboxsdk.com/v1/";
+NSString * const HoCPushBoxSDKHost = @"api.pushboxsdk.com";
 #pragma mark JSON keys
-NSString * const PushBoxSDKJSONKeyHMAC = @"hmac";
-NSString * const PushBoxSDKJSONKeyTS = @"ts";
-NSString * const PushBoxSDKJSONKeyApiKey = @"app_key";
-NSString * const PushBoxSDKJSONKeyToken = @"token";
-NSString * const PushBoxSDKJSONKeyUid = @"uid";
-NSString * const PushBoxSDKJSONKeyProfileId = @"profile_identifier";
-NSString * const PushBoxSDKJSONKeyPlatform = @"platform";
-NSString * const PushBoxSDKJSONKeyOccurenceTimestamp = @"timestamp";
-NSString * const PushBoxSDKJSONKeyAge = @"age";
-NSString * const PushBoxSDKJSONKeyBirthday = @"birthday";
-NSString * const PushBoxSDKJSONKeyGender = @"gender";
-NSString * const PushBoxSDKJSONKeyEvent = @"event";
-NSString * const PushBoxSDKJSONKeyChannels = @"channels";
-NSString * const PushBoxSDKJSONKeyLocationLatitude = @"latitude";
-NSString * const PushBoxSDKJSONKeyLocationLongitude = @"longitude";
-NSString * const PushBoxSDKJSONKeySuccess = @"success";
-NSString * const PushBoxSDKJSONKeyMessage = @"message";
+NSString * const HoCPushBoxSDKJSONKeyHMAC = @"hmac";
+NSString * const HoCPushBoxSDKJSONKeyTS = @"ts";
+NSString * const HoCPushBoxSDKJSONKeyApiKey = @"app_key";
+NSString * const HoCPushBoxSDKJSONKeyToken = @"token";
+NSString * const HoCPushBoxSDKJSONKeyUid = @"uid";
+NSString * const HoCPushBoxSDKJSONKeyProfileId = @"profile_identifier";
+NSString * const HoCPushBoxSDKJSONKeyPlatform = @"platform";
+NSString * const HoCPushBoxSDKJSONKeyOccurenceTimestamp = @"timestamp";
+NSString * const HoCPushBoxSDKJSONKeyAge = @"age";
+NSString * const HoCPushBoxSDKJSONKeyBirthday = @"birthday";
+NSString * const HoCPushBoxSDKJSONKeyGender = @"gender";
+NSString * const HoCPushBoxSDKJSONKeyEvent = @"event";
+NSString * const HoCPushBoxSDKJSONKeyChannels = @"channels";
+NSString * const HoCPushBoxSDKJSONKeyLocationLatitude = @"latitude";
+NSString * const HoCPushBoxSDKJSONKeyLocationLongitude = @"longitude";
+NSString * const HoCPushBoxSDKJSONKeySuccess = @"success";
+NSString * const HoCPushBoxSDKJSONKeyMessage = @"message";
 
 #pragma mark api methods
-NSString * const PushBoxSDKMethodSetToken = @"set_token";
-NSString * const PushBoxSDKMethodSetAge = @"set_age";
-NSString * const PushBoxSDKMethodSetBirthday = @"set_birthday";
-NSString * const PushBoxSDKMethodLogEvent = @"log_event";
-NSString * const PushBoxSDKMethodLogLocation = @"log_location";
-NSString * const PushBoxSDKMethodSetGender = @"set_gender";
-NSString * const PushBoxSDKMethodSetChannels = @"set_channels";
+NSString * const HoCPushBoxSDKMethodSetToken = @"set_token";
+NSString * const HoCPushBoxSDKMethodSetAge = @"set_age";
+NSString * const HoCPushBoxSDKMethodSetBirthday = @"set_birthday";
+NSString * const HoCPushBoxSDKMethodLogEvent = @"log_event";
+NSString * const HoCPushBoxSDKMethodLogLocation = @"log_location";
+NSString * const HoCPushBoxSDKMethodSetGender = @"set_gender";
+NSString * const HoCPushBoxSDKMethodSetChannels = @"set_channels";
 
 #pragma mark JSON values
-NSString * const PushBoxSDKJSONValuePlatform = @"iOS";
+NSString * const HoCPushBoxSDKJSONValuePlatform = @"iOS";
 
 #pragma mark user defaults
-NSString * const PushBoxSDKSuitName = @"PushBoxSDK.suit.name";
+NSString * const HoCPushBoxSDKSuitName = @"HoCPushBoxSDK.suit.name";
 
 #pragma mark User defaults keys
-NSString * const PushBoxSDKDefaultsUid = @"uid";
-NSString * const PushBoxSDKDefaultsQueue = @"queue";
-NSString * const PushBoxSDKDefaultsKeyMethod = @"method";
-NSString * const PushBoxSDKDefaultsKeyDict = @"dict";
+NSString * const HoCPushBoxSDKDefaultsUid = @"uid";
+NSString * const HoCPushBoxSDKDefaultsQueue = @"queue";
+NSString * const HoCPushBoxSDKDefaultsKeyMethod = @"method";
+NSString * const HoCPushBoxSDKDefaultsKeyDict = @"dict";
 
 
 #pragma mark - static variables
@@ -69,7 +69,7 @@ static NSString *API_SECRET;
 
 
 #pragma mark - properties definition
-@interface PushBoxSDK ()
+@interface HoCPushBoxSDK ()
 
 #pragma mark profile identifier
 @property (nonatomic, strong) NSString *profileIdentifier;
@@ -91,14 +91,14 @@ static NSString *API_SECRET;
 @property (nonatomic, strong) NSString *uid;
 
 #pragma mark reachability client
-@property (nonatomic, strong) PushBoxReachability *netStatus;
+@property (nonatomic, strong) HoCPushBoxReachability *netStatus;
 
 #pragma mark timestamp
 @property (nonatomic, readonly) long timestamp;
 
 @end
 
-@implementation PushBoxSDK
+@implementation HoCPushBoxSDK
 @synthesize uid = _uid;
 
 #pragma mark - initialization
@@ -107,9 +107,9 @@ static NSString *API_SECRET;
     self = [super init];
     if (self)
     {
-        self.netStatus = [PushBoxReachability reachabilityWithHostName:PushBoxSDKHost];
+        self.netStatus = [HoCPushBoxReachability reachabilityWithHostName:HoCPushBoxSDKHost];
         [self.netStatus startNotifier];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:PushBoxReachabilityChangedNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:HoCPushBoxReachabilityChangedNotification object:nil];
 
     }
     return self;
@@ -121,11 +121,11 @@ static NSString *API_SECRET;
     assert(API_KEY != nil);
     assert(API_SECRET != nil);
     
-    static PushBoxSDK *sharedInstance;
+    static HoCPushBoxSDK *sharedInstance;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^
                   {
-                      sharedInstance = [[PushBoxSDK alloc] init];
+                      sharedInstance = [[HoCPushBoxSDK alloc] init];
                   });
     return sharedInstance;
 }
@@ -165,8 +165,8 @@ static NSString *API_SECRET;
 - (void) setAge:(NSInteger) age
 {
     NSMutableDictionary *dict = self.defaultDictionary;
-    [dict setObject:[NSNumber numberWithInteger:age] forKey:PushBoxSDKJSONKeyAge];
-    [self addDictionary:dict toQueueForMethod:PushBoxSDKMethodSetAge];
+    [dict setObject:[NSNumber numberWithInteger:age] forKey:HoCPushBoxSDKJSONKeyAge];
+    [self addDictionary:dict toQueueForMethod:HoCPushBoxSDKMethodSetAge];
     
 }
 
@@ -177,34 +177,34 @@ static NSString *API_SECRET;
     [formatter setDateFormat:@"yyyy/MM/dd"];
     NSString *date = [formatter stringFromDate:birthday];
     NSMutableDictionary *dict = self.defaultDictionary;
-    [dict setObject:date forKey:PushBoxSDKJSONKeyBirthday];
-    [self addDictionary:dict toQueueForMethod:PushBoxSDKMethodSetBirthday];
+    [dict setObject:date forKey:HoCPushBoxSDKJSONKeyBirthday];
+    [self addDictionary:dict toQueueForMethod:HoCPushBoxSDKMethodSetBirthday];
 }
 
 #pragma mark set gender
-- (void) setGender:(PushBoxGenderType) gender
+- (void) setGender:(HoCPushBoxGenderType) gender
 {
     NSMutableDictionary *dict = self.defaultDictionary;
     
-    [dict setObject:[NSNumber numberWithInteger:gender] forKey:PushBoxSDKJSONKeyGender];
-    [self addDictionary:dict toQueueForMethod:PushBoxSDKMethodSetGender];
+    [dict setObject:[NSNumber numberWithInteger:gender] forKey:HoCPushBoxSDKJSONKeyGender];
+    [self addDictionary:dict toQueueForMethod:HoCPushBoxSDKMethodSetGender];
 }
 
 #pragma mark log event
 - (void) logEvent:(NSString *) event
 {
     NSMutableDictionary *dict = self.defaultDictionary;
-    [dict setObject:event forKey:PushBoxSDKJSONKeyEvent];
-    [self addDictionary:dict toQueueForMethod:PushBoxSDKMethodLogEvent];
+    [dict setObject:event forKey:HoCPushBoxSDKJSONKeyEvent];
+    [self addDictionary:dict toQueueForMethod:HoCPushBoxSDKMethodLogEvent];
 }
 
 #pragma mark log location
 - (void) logLocationWithLatitude:(double) latitude longitude:(double) longitude
 {
     NSMutableDictionary *dict = self.defaultDictionary;
-    [dict setObject:[NSNumber numberWithDouble:latitude] forKey:PushBoxSDKJSONKeyLocationLatitude];
-    [dict setObject:[NSNumber numberWithDouble:longitude] forKey:PushBoxSDKJSONKeyLocationLongitude];
-    [self addDictionary:dict toQueueForMethod:PushBoxSDKMethodLogLocation];
+    [dict setObject:[NSNumber numberWithDouble:latitude] forKey:HoCPushBoxSDKJSONKeyLocationLatitude];
+    [dict setObject:[NSNumber numberWithDouble:longitude] forKey:HoCPushBoxSDKJSONKeyLocationLongitude];
+    [self addDictionary:dict toQueueForMethod:HoCPushBoxSDKMethodLogLocation];
 }
 
 #pragma mark set channels
@@ -217,8 +217,8 @@ static NSString *API_SECRET;
     }
     
     NSMutableDictionary *dict = self.defaultDictionary;
-    [dict setObject:channels forKey:PushBoxSDKJSONKeyChannels];
-    [self addDictionary:dict toQueueForMethod:PushBoxSDKMethodSetChannels];
+    [dict setObject:channels forKey:HoCPushBoxSDKJSONKeyChannels];
+    [self addDictionary:dict toQueueForMethod:HoCPushBoxSDKMethodSetChannels];
 }
 
 #pragma mark - private properties
@@ -228,7 +228,7 @@ static NSString *API_SECRET;
 {
     if (!_uid)
     {
-        _uid = [self.sdkDefaults valueForKey:PushBoxSDKDefaultsUid];
+        _uid = [self.sdkDefaults valueForKey:HoCPushBoxSDKDefaultsUid];
     }
     return _uid;
 }
@@ -237,7 +237,7 @@ static NSString *API_SECRET;
 - (void) setUid:(NSString *) uid
 {
     _uid = uid;
-    [self.sdkDefaults setObject:_uid forKey:PushBoxSDKDefaultsUid];
+    [self.sdkDefaults setObject:_uid forKey:HoCPushBoxSDKDefaultsUid];
     [self.sdkDefaults synchronize];
 }
 
@@ -253,7 +253,7 @@ static NSString *API_SECRET;
 {
     if (!_sdkDefaults)
     {
-        _sdkDefaults = [[NSUserDefaults alloc] initWithSuiteName:PushBoxSDKSuitName];
+        _sdkDefaults = [[NSUserDefaults alloc] initWithSuiteName:HoCPushBoxSDKSuitName];
     }
     return _sdkDefaults;
 }
@@ -273,7 +273,7 @@ static NSString *API_SECRET;
         return NO;
     }
 
-    if ([self.netStatus currentReachabilityStatus] == PushBoxNetworkStatusNotReachable)
+    if ([self.netStatus currentReachabilityStatus] == HoCPushBoxNetworkStatusNotReachable)
     {
         return NO;
     }
@@ -285,10 +285,10 @@ static NSString *API_SECRET;
 {
     NSDate *now = [NSDate date];
     
-    NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithDictionary:@{PushBoxSDKJSONKeyApiKey : API_KEY, PushBoxSDKJSONKeyPlatform : PushBoxSDKJSONValuePlatform, PushBoxSDKJSONKeyOccurenceTimestamp : [NSNumber numberWithLong:[now timeIntervalSinceNow]]}];
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithDictionary:@{HoCPushBoxSDKJSONKeyApiKey : API_KEY, HoCPushBoxSDKJSONKeyPlatform : HoCPushBoxSDKJSONValuePlatform, HoCPushBoxSDKJSONKeyOccurenceTimestamp : [NSNumber numberWithLong:[now timeIntervalSinceNow]]}];
     if (self.profileIdentifier)
     {
-        [dict setObject:self.token forKey:PushBoxSDKJSONKeyProfileId];
+        [dict setObject:self.token forKey:HoCPushBoxSDKJSONKeyProfileId];
     }
     return dict;
 }
@@ -309,9 +309,9 @@ static NSString *API_SECRET;
  **/
 - (void) reachabilityChanged:(NSNotification *)note
 {
-    PushBoxReachability *reachability = [note object];
-    PushBoxNetworkStatus status = [reachability currentReachabilityStatus];
-    if (status != PushBoxNetworkStatusNotReachable)
+    HoCPushBoxReachability *reachability = [note object];
+    HoCPushBoxNetworkStatus status = [reachability currentReachabilityStatus];
+    if (status != HoCPushBoxNetworkStatusNotReachable)
     {
         // Net available
         [self takeNext];
@@ -345,13 +345,13 @@ static NSString *API_SECRET;
     NSNumber *ts = [NSNumber numberWithLong:timestamp];
 
     NSMutableDictionary *dict = [dictionary mutableCopy];
-    [dict setObject:ts forKey:PushBoxSDKJSONKeyTS];
-    [dict setObject:hmac forKey:PushBoxSDKJSONKeyHMAC];
+    [dict setObject:ts forKey:HoCPushBoxSDKJSONKeyTS];
+    [dict setObject:hmac forKey:HoCPushBoxSDKJSONKeyHMAC];
     
     // Adds uid to dictionary
     if (self.uid)
     {
-        [dict setObject:self.uid forKey:PushBoxSDKJSONKeyUid];
+        [dict setObject:self.uid forKey:HoCPushBoxSDKJSONKeyUid];
     }
     
     return dict;
@@ -363,11 +363,11 @@ static NSString *API_SECRET;
  * @param code the code to set
  * @param reason the reason to the error
  */
-- (void) postErrorNotificationWithCode:(PushBoxErrorCode) code andReason:(NSString *) reason
+- (void) postErrorNotificationWithCode:(HoCPushBoxErrorCode) code andReason:(NSString *) reason
 {
-    NSDictionary *dictionary = @{PushBoxSDKNotificationFailureCodeKey : [NSNumber numberWithInteger:code], PushBoxSDKNotificationFailureReasonKey : reason};
+    NSDictionary *dictionary = @{HoCPushBoxSDKNotificationFailureCodeKey : [NSNumber numberWithInteger:code], HoCPushBoxSDKNotificationFailureReasonKey : reason};
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:PushBoxSDKNotificationFailure object:nil userInfo:dictionary];
+    [[NSNotificationCenter defaultCenter] postNotificationName:HoCPushBoxSDKNotificationFailure object:nil userInfo:dictionary];
 }
 
 #pragma mark request creation
@@ -380,7 +380,7 @@ static NSString *API_SECRET;
 - (NSMutableURLRequest *) requestWithPostData:(NSData *) postData andMethod:(NSString *) method
 {
     
-    NSMutableURLRequest *rq = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", PushBoxSDKApiUrl, method]]];
+    NSMutableURLRequest *rq = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", HoCPushBoxSDKApiUrl, method]]];
     NSString *argString = [[NSString alloc] initWithData:postData encoding:NSUTF8StringEncoding];
     
     [rq setValue:[NSString stringWithFormat:@"%lu", (unsigned long)[argString length]] forHTTPHeaderField:@"Content-length"];
@@ -407,12 +407,12 @@ static NSString *API_SECRET;
  **/
 - (void) addDictionary:(NSDictionary *) dictionary toQueueForMethod:(NSString *) method
 {
-    NSDictionary *dict = @{PushBoxSDKDefaultsKeyMethod : method, PushBoxSDKDefaultsKeyDict : dictionary};
-    NSMutableArray *queue = [([self.sdkDefaults arrayForKey:PushBoxSDKDefaultsQueue] ?:@[]) mutableCopy];
+    NSDictionary *dict = @{HoCPushBoxSDKDefaultsKeyMethod : method, HoCPushBoxSDKDefaultsKeyDict : dictionary};
+    NSMutableArray *queue = [([self.sdkDefaults arrayForKey:HoCPushBoxSDKDefaultsQueue] ?:@[]) mutableCopy];
     
     [queue addObject:dict];
     
-    [self.sdkDefaults setObject:queue forKey:PushBoxSDKDefaultsQueue];
+    [self.sdkDefaults setObject:queue forKey:HoCPushBoxSDKDefaultsQueue];
     [self.sdkDefaults synchronize];
     [self takeNext];
 }
@@ -426,7 +426,7 @@ static NSString *API_SECRET;
  **/
 - (NSDictionary *) peekQueue
 {
-    return [[self.sdkDefaults arrayForKey:PushBoxSDKDefaultsQueue] ?: @[] firstObject];
+    return [[self.sdkDefaults arrayForKey:HoCPushBoxSDKDefaultsQueue] ?: @[] firstObject];
 }
 
 /**
@@ -435,10 +435,10 @@ static NSString *API_SECRET;
  **/
 - (NSDictionary *) popQueue
 {
-    NSMutableArray *queue = [([self.sdkDefaults arrayForKey:PushBoxSDKDefaultsQueue] ?:@[]) mutableCopy];
+    NSMutableArray *queue = [([self.sdkDefaults arrayForKey:HoCPushBoxSDKDefaultsQueue] ?:@[]) mutableCopy];
     NSDictionary *dict = [queue firstObject];
     [queue removeObjectAtIndex:0];
-    [self.sdkDefaults setObject:queue forKey:PushBoxSDKDefaultsQueue];
+    [self.sdkDefaults setObject:queue forKey:HoCPushBoxSDKDefaultsQueue];
     [self.sdkDefaults synchronize];
     
     return dict;
@@ -469,8 +469,8 @@ static NSString *API_SECRET;
     {
         // The device token is not send to the api yet - do it before taking any jobs from the queue
         NSMutableDictionary *requestDict = self.defaultDictionary;
-        [requestDict setValue:self.token forKey:PushBoxSDKJSONKeyToken];
-        [self handleRequestForMethod:PushBoxSDKMethodSetToken withDictionary:requestDict];
+        [requestDict setValue:self.token forKey:HoCPushBoxSDKJSONKeyToken];
+        [self handleRequestForMethod:HoCPushBoxSDKMethodSetToken withDictionary:requestDict];
     }
     else
     {
@@ -478,8 +478,8 @@ static NSString *API_SECRET;
         NSDictionary *dict = [self peekQueue];
         if (dict)
         {
-            NSString *method = [dict valueForKey:PushBoxSDKDefaultsKeyMethod];
-            NSDictionary *jsonDict = [dict valueForKey:PushBoxSDKDefaultsKeyDict];
+            NSString *method = [dict valueForKey:HoCPushBoxSDKDefaultsKeyMethod];
+            NSDictionary *jsonDict = [dict valueForKey:HoCPushBoxSDKDefaultsKeyDict];
             if (self.uid)
             {
                 // Only send if uid is set
@@ -502,7 +502,7 @@ static NSString *API_SECRET;
     NSData *postData = [NSJSONSerialization dataWithJSONObject:[self finalizeDictionary:dictionary] options:0 error:&serializationError];
     if (serializationError != nil)
     {
-        [self postErrorNotificationWithCode:PushBoxErrorCodeInternalError andReason:@"Could not build request"];
+        [self postErrorNotificationWithCode:HoCPushBoxErrorCodeInternalError andReason:@"Could not build request"];
         return;
     }
 
@@ -530,7 +530,7 @@ static NSString *API_SECRET;
                 else
                 {
                     // Parsing failed - send notification
-                    [self postErrorNotificationWithCode:PushBoxErrorCodeInternalError andReason:@"Could not parse result"];
+                    [self postErrorNotificationWithCode:HoCPushBoxErrorCodeInternalError andReason:@"Could not parse result"];
                 }
                 
             }
@@ -556,7 +556,7 @@ static NSString *API_SECRET;
 - (void) handleConnectionError:(NSError *) connectionError forMethod:(NSString *) method
 {
     NSString *msg = @"Error connecting";
-    [self postErrorNotificationWithCode:PushBoxErrorCodeNetworkError andReason:msg];
+    [self postErrorNotificationWithCode:HoCPushBoxErrorCodeNetworkError andReason:msg];
     
 }
 
@@ -569,16 +569,16 @@ static NSString *API_SECRET;
 - (void) handleResult:(NSDictionary *) jsonResult code:(NSInteger) code forMethod:(NSString *) method
 {
     // Check if the result was successful
-    if ([[jsonResult valueForKey:PushBoxSDKJSONKeySuccess] boolValue])
+    if ([[jsonResult valueForKey:HoCPushBoxSDKJSONKeySuccess] boolValue])
     {
         // Success - notify
-        [[NSNotificationCenter defaultCenter] postNotificationName:PushBoxSDKNotificationSuccess object:nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:HoCPushBoxSDKNotificationSuccess object:nil];
         
         // Set token is the only request that returns data and it is not part of the queue, so handle this as a special case
-        if ([method isEqualToString:PushBoxSDKMethodSetToken])
+        if ([method isEqualToString:HoCPushBoxSDKMethodSetToken])
         {
             // set uid returned
-            self.uid = [jsonResult valueForKey:PushBoxSDKJSONKeyUid];
+            self.uid = [jsonResult valueForKey:HoCPushBoxSDKJSONKeyUid];
             // set token send
             self.tokenSend = YES;
         }
@@ -596,17 +596,17 @@ static NSString *API_SECRET;
         NSString *msg = @"Unknown error";
         
         // Parse message if possible
-        msg = [jsonResult valueForKey:PushBoxSDKJSONKeyMessage] ?:msg;
+        msg = [jsonResult valueForKey:HoCPushBoxSDKJSONKeyMessage] ?:msg;
         // Check the http status code
         if (code == 401)
         {
             // 401 is authorization error - send notification
-            [self postErrorNotificationWithCode:PushBoxErrorCodeAuthorizationError andReason:msg];
+            [self postErrorNotificationWithCode:HoCPushBoxErrorCodeAuthorizationError andReason:msg];
         }
         else
         {
             // Some other kind of error - send notification
-            [self postErrorNotificationWithCode:PushBoxErrorCodeApiError andReason:msg];
+            [self postErrorNotificationWithCode:HoCPushBoxErrorCodeApiError andReason:msg];
         }
     }
 }

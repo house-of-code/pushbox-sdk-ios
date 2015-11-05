@@ -1,12 +1,12 @@
 //
-//  PushBoxReachability.m
-//  PushBox-sdk-ios
+//  HoCPushBoxReachability.m
+//  HoCPushBox-sdk-ios
 //
 //  Created by Gert Lavsen on 04/11/15.
 //  Copyright © 2015 House of Code. All rights reserved.
 //
 
-#import "HoCPushBoxReachability.h"
+#import "HoCHoCPushBoxReachability.h"
 #import <arpa/inet.h>
 #import <ifaddrs.h>
 #import <netdb.h>
@@ -14,31 +14,31 @@
 @import SystemConfiguration;
 
 #import <CoreFoundation/CoreFoundation.h>
-NSString * const PushBoxReachabilityChangedNotification = @"PushBox.SDK.NetworkChangedNotification";
+NSString * const HoCPushBoxReachabilityChangedNotification = @"HoCPushBox.SDK.NetworkChangedNotification";
 
 static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags flags, void* info)
 {
 #pragma unused (target, flags)
     NSCAssert(info != NULL, @"info was NULL in ReachabilityCallback");
-    NSCAssert([(__bridge NSObject*) info isKindOfClass: [PushBoxReachability class]], @"info was wrong class in ReachabilityCallback");
+    NSCAssert([(__bridge NSObject*) info isKindOfClass: [HoCPushBoxReachability class]], @"info was wrong class in ReachabilityCallback");
     
-    PushBoxReachability* noteObject = (__bridge PushBoxReachability *)info;
+    HoCPushBoxReachability* noteObject = (__bridge HoCPushBoxReachability *)info;
     NSLog(@"Hello: %@", noteObject);
     // Post a notification to notify the client that the network reachability changed.
-    [[NSNotificationCenter defaultCenter] postNotificationName: PushBoxReachabilityChangedNotification object: noteObject];
+    [[NSNotificationCenter defaultCenter] postNotificationName: HoCPushBoxReachabilityChangedNotification object: noteObject];
 }
 
-@interface PushBoxReachability ()
+@interface HoCPushBoxReachability ()
 @property (nonatomic, assign) BOOL alwaysReturnLocalWiFiStatus;
 @property (nonatomic) SCNetworkReachabilityRef reachabilityRef;
 @end
 
-@implementation PushBoxReachability
+@implementation HoCPushBoxReachability
 
 
 + (instancetype)reachabilityWithHostName:(NSString *)hostName
 {
-    PushBoxReachability* returnValue = NULL;
+    HoCPushBoxReachability* returnValue = NULL;
     SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithName(NULL, [hostName UTF8String]);
     if (reachability != NULL)
     {
@@ -57,7 +57,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 {
     SCNetworkReachabilityRef reachability = SCNetworkReachabilityCreateWithAddress(kCFAllocatorDefault, (const struct sockaddr *)hostAddress);
     
-    PushBoxReachability* returnValue = NULL;
+    HoCPushBoxReachability* returnValue = NULL;
     
     if (reachability != NULL)
     {
@@ -94,7 +94,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     // IN_LINKLOCALNETNUM is defined in <netinet/in.h> as 169.254.0.0.
     localWifiAddress.sin_addr.s_addr = htonl(IN_LINKLOCALNETNUM);
     
-    PushBoxReachability* returnValue = [self reachabilityWithAddress: &localWifiAddress];
+    HoCPushBoxReachability* returnValue = [self reachabilityWithAddress: &localWifiAddress];
     if (returnValue != NULL)
     {
         returnValue->_alwaysReturnLocalWiFiStatus = YES;
@@ -144,35 +144,35 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 #pragma mark - Network Flag Handling
 
-- (PushBoxNetworkStatus) localWiFiStatusForFlags:(SCNetworkReachabilityFlags)flags
+- (HoCPushBoxNetworkStatus) localWiFiStatusForFlags:(SCNetworkReachabilityFlags)flags
 {
-    PushBoxNetworkStatus returnValue = PushBoxNetworkStatusNotReachable;
+    HoCPushBoxNetworkStatus returnValue = HoCPushBoxNetworkStatusNotReachable;
     
     if ((flags & kSCNetworkReachabilityFlagsReachable) && (flags & kSCNetworkReachabilityFlagsIsDirect))
     {
-        returnValue = PushBoxNetworkStatusReachableViaWifi;
+        returnValue = HoCPushBoxNetworkStatusReachableViaWifi;
     }
     
     return returnValue;
 }
 
 
-- (PushBoxNetworkStatus) networkStatusForFlags:(SCNetworkReachabilityFlags)flags
+- (HoCPushBoxNetworkStatus) networkStatusForFlags:(SCNetworkReachabilityFlags)flags
 {
     if ((flags & kSCNetworkReachabilityFlagsReachable) == 0)
     {
         // The target host is not reachable.
-        return PushBoxNetworkStatusNotReachable;
+        return HoCPushBoxNetworkStatusNotReachable;
     }
     
-    PushBoxNetworkStatus returnValue = PushBoxNetworkStatusNotReachable;
+    HoCPushBoxNetworkStatus returnValue = HoCPushBoxNetworkStatusNotReachable;
     
     if ((flags & kSCNetworkReachabilityFlagsConnectionRequired) == 0)
     {
         /*
          If the target host is reachable and no connection is required then we'll assume (for now) that you're on Wi-Fi...
          */
-        returnValue = PushBoxNetworkStatusReachableViaWifi;
+        returnValue = HoCPushBoxNetworkStatusReachableViaWifi;
     }
     
     if ((((flags & kSCNetworkReachabilityFlagsConnectionOnDemand ) != 0) ||
@@ -187,7 +187,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             /*
              ... and no [user] intervention is needed...
              */
-            returnValue = PushBoxNetworkStatusReachableViaWifi;
+            returnValue = HoCPushBoxNetworkStatusReachableViaWifi;
         }
     }
     
@@ -196,7 +196,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         /*
          ... but WWAN connections are OK if the calling application is using the CFNetwork APIs.
          */
-        returnValue = PushBoxNetworkStatusReachableViaWWAN;
+        returnValue = HoCPushBoxNetworkStatusReachableViaWWAN;
     }
     
     return returnValue;
@@ -217,10 +217,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 
-- (PushBoxNetworkStatus) currentReachabilityStatus
+- (HoCPushBoxNetworkStatus) currentReachabilityStatus
 {
     NSAssert(_reachabilityRef != NULL, @"currentNetworkStatus called with NULL SCNetworkReachabilityRef");
-    PushBoxNetworkStatus returnValue = PushBoxNetworkStatusNotReachable;
+    HoCPushBoxNetworkStatus returnValue = HoCPushBoxNetworkStatusNotReachable;
     SCNetworkReachabilityFlags flags;
     
     if (SCNetworkReachabilityGetFlags(_reachabilityRef, &flags))

@@ -1,6 +1,6 @@
 //
-//  PushBoxReachability.h
-//  PushBox-sdk-ios
+//  HoCPushBoxReachability.h
+//  HoCPushBox-sdk-ios
 //
 //  Created by Gert Lavsen on 04/11/15.
 //  Copyright © 2015 House of Code. All rights reserved.
@@ -8,17 +8,17 @@
 
 #import <Foundation/Foundation.h>
 
-typedef NS_ENUM(NSUInteger, PushBoxNetworkStatus)
+typedef NS_ENUM(NSUInteger, HoCPushBoxNetworkStatus)
 {
-    PushBoxNetworkStatusNotReachable = 0,
-    PushBoxNetworkStatusReachableViaWifi = 1,
-    PushBoxNetworkStatusReachableViaWWAN = 2
+    HoCPushBoxNetworkStatusNotReachable = 0,
+    HoCPushBoxNetworkStatusReachableViaWifi = 1,
+    HoCPushBoxNetworkStatusReachableViaWWAN = 2
 };
 
-extern NSString * const PushBoxReachabilityChangedNotification;
+extern NSString * const HoCPushBoxReachabilityChangedNotification;
 
 
-@interface PushBoxReachability : NSObject
+@interface HoCPushBoxReachability : NSObject
 
 /*!
  * Use to check the reachability of a given host name.
@@ -46,7 +46,7 @@ extern NSString * const PushBoxReachabilityChangedNotification;
 - (BOOL) startNotifier;
 - (void) stopNotifier;
 
-- (PushBoxNetworkStatus) currentReachabilityStatus;
+- (HoCPushBoxNetworkStatus) currentReachabilityStatus;
 
 /*!
  * WWAN may be available, but not active until a connection has been established. WiFi may require a connection for VPN on Demand.

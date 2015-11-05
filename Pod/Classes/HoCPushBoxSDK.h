@@ -1,6 +1,6 @@
 //
-//  PushBoxSDK.h
-//  PushBox-sdk-ios
+//  HoCPushBoxSDK.h
+//  HoCPushBox-sdk-ios
 //
 //  Created by Gert Lavsen on 03/11/15.
 //  Copyright © 2015 House of Code. All rights reserved.
@@ -10,43 +10,43 @@
 
 #pragma mark - Notications send by the sdk
 /** Notification name when data send successfully */
-extern NSString * const PushBoxSDKNotificationSuccess;
+extern NSString * const HoCPushBoxSDKNotificationSuccess;
 /** Notification name when data sending failed */
-extern NSString * const PushBoxSDKNotificationFailure;
+extern NSString * const HoCPushBoxSDKNotificationFailure;
 /** Key for notification userinfo object for getting the reason to the failure */
-extern NSString * const PushBoxSDKNotificationFailureReasonKey;
+extern NSString * const HoCPushBoxSDKNotificationFailureReasonKey;
 /** Key for notification userinfo object for getting the code for the failure */
-extern NSString * const PushBoxSDKNotificationFailureCodeKey;
+extern NSString * const HoCPushBoxSDKNotificationFailureCodeKey;
 
 
 #pragma mark - Error codes
-typedef NS_ENUM(NSUInteger, PushBoxErrorCode)
+typedef NS_ENUM(NSUInteger, HoCPushBoxErrorCode)
 {
     /** Unknown error */
-    PushBoxErrorCodeUnknown = 10001,
+    HoCPushBoxErrorCodeUnknown = 10001,
     /** Internal error */
-    PushBoxErrorCodeInternalError = 10002,
+    HoCPushBoxErrorCodeInternalError = 10002,
     /** authorization error */
-    PushBoxErrorCodeAuthorizationError = 10003,
+    HoCPushBoxErrorCodeAuthorizationError = 10003,
     /** network error */
-    PushBoxErrorCodeNetworkError = 10004,
+    HoCPushBoxErrorCodeNetworkError = 10004,
     /** error returned from the api */
-    PushBoxErrorCodeApiError = 10005
+    HoCPushBoxErrorCodeApiError = 10005
 };
 
 
 #pragma mark - Gender types
-typedef NS_ENUM(NSUInteger, PushBoxGenderType)
+typedef NS_ENUM(NSUInteger, HoCPushBoxGenderType)
 {
     /** Unknown gender type - default value */
-    PushBoxGenderTypeUnknown = 0,
+    HoCPushBoxGenderTypeUnknown = 0,
     /** Female */
-    PushBoxGenderTypeFemale = 1,
+    HoCPushBoxGenderTypeFemale = 1,
     /** Male */
-    PushBoxGenderTypeMale = 2
+    HoCPushBoxGenderTypeMale = 2
 };
 
-@interface PushBoxSDK : NSObject
+@interface HoCPushBoxSDK : NSObject
 
 #pragma mark - initialization of the sdk
 /** 
@@ -102,7 +102,7 @@ typedef NS_ENUM(NSUInteger, PushBoxGenderType)
  * Set the gender of the user
  * @param gender the gender of the user
  **/
-- (void) setGender:(PushBoxGenderType) gender;
+- (void) setGender:(HoCPushBoxGenderType) gender;
 /**
  * Logs an event
  * @param event the event to log
