@@ -18,7 +18,7 @@ NSString * const HoCPushBoxSDKNotificationFailure = @"HoCPushBoxSDK.successfull.
 NSString * const HoCPushBoxSDKNotificationFailureReasonKey = @"HoCPushBoxSDK.successfull.note.reason.key";
 NSString * const HoCPushBoxSDKNotificationFailureCodeKey = @"HoCPushBoxSDK.successfull.note.code.key";
 #pragma mark urls
-NSString * const HoCPushBoxSDKApiUrl = @"http://api.pushboxsdk.com/v1/";
+NSString * const HoCPushBoxSDKApiUrl = @"https://api.pushboxsdk.com/v1/";
 NSString * const HoCPushBoxSDKHost = @"api.pushboxsdk.com";
 #pragma mark JSON keys
 NSString * const HoCPushBoxSDKJSONKeyHMAC = @"hmac";
