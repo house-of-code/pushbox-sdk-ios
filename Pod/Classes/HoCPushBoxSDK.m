@@ -6,8 +6,8 @@
 //  Copyright © 2015 House of Code. All rights reserved.
 //
 
-#import "HoCHoCPushBoxSDK.h"
-#import "HoCHoCPushBoxReachability.h"
+#import "HoCPushBoxSDK.h"
+#import "HoCPushBoxReachability.h"
 #import "NSString+HMAC.h"
 
 

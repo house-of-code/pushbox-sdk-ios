@@ -6,7 +6,7 @@
 //  Copyright © 2015 House of Code. All rights reserved.
 //
 
-#import "HoCHoCPushBoxReachability.h"
+#import "HoCPushBoxReachability.h"
 #import <arpa/inet.h>
 #import <ifaddrs.h>
 #import <netdb.h>
