@@ -221,6 +221,18 @@ static NSString *API_SECRET;
     [self addDictionary:dict toQueueForMethod:HoCPushBoxSDKMethodSetChannels];
 }
 
+#pragma mark - push opens etc
+
+- (void) handleRemoteNotification:(NSDictionary*)userInfo
+{
+  // TODO
+}
+
+- (void) handleLaunchingWithOptions:(NSDictionary*)launchOptions
+{
+  // TODO
+}
+
 #pragma mark - private properties
 
 #pragma mark uid - get stored uid
