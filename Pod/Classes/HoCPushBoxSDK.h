@@ -69,7 +69,6 @@ typedef NS_ENUM(NSUInteger, HoCPushBoxGenderType)
  */
 + (instancetype) sharedInstance;
 
-
 #pragma mark - set profile identifier
 /**
  * Sets profile identifer for the user
@@ -86,7 +85,6 @@ typedef NS_ENUM(NSUInteger, HoCPushBoxGenderType)
 - (void) setDeviceToken:(NSData *) token;
 
 #pragma mark - handle push opens
-
 /**
  * Payload handler
  *
@@ -107,6 +105,14 @@ typedef NS_ENUM(NSUInteger, HoCPushBoxGenderType)
  * This method needs to be called from application:didFinishLaunchingWithOptions:
  */
 - (void) handleLaunchingWithOptions:(NSDictionary*)launchOptions;
+
+#pragma mark - stored messages
+
+/**
+ * Returns all stored messages that can be used in an inbox
+ *
+ */
+- (NSArray*) storedMessages;
 
 #pragma mark - send data
 

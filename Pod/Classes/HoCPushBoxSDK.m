@@ -238,6 +238,14 @@ static NSString *API_SECRET;
   // TODO
 }
 
+#pragma mark - stored messages
+
+- (NSArray*) storedMessages
+{
+  // TODO
+  return [NSArray new]; 
+}
+
 #pragma mark - private properties
 
 #pragma mark uid - get stored uid
