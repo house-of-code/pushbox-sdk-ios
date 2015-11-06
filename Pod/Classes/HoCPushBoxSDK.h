@@ -88,6 +88,13 @@ typedef NS_ENUM(NSUInteger, HoCPushBoxGenderType)
 #pragma mark - handle push opens
 
 /**
+ * Payload handler
+ *
+ * Called when a push is opened returns the payload from cms. Use this payload to do whatever action is required.
+ */
+- (void) registerPayloadHandler:(void (^)(id payload))payloadHandler;
+
+/**
  * Handle push data when received
  *
  * This method needs to be called from application:didReceiveRemoteNotification:

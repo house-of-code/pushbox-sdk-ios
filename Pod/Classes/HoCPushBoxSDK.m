@@ -233,6 +233,11 @@ static NSString *API_SECRET;
   // TODO
 }
 
+- (void) registerPayloadHandler:(void (^)(id payload))payloadHandler
+{
+  // TODO
+}
+
 #pragma mark - private properties
 
 #pragma mark uid - get stored uid
