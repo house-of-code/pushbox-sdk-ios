@@ -13,6 +13,9 @@
 extern NSString * const HoCPushBoxSDKNotificationSuccess;
 /** Notification name when data sending failed */
 extern NSString * const HoCPushBoxSDKNotificationFailure;
+/** Key for notification userinfo object for getting the method the notification is about*/
+ extern NSString * const HoCPushBoxSDKNotificationMethodKey;
+
 /** Key for notification userinfo object for getting the reason to the failure */
 extern NSString * const HoCPushBoxSDKNotificationFailureReasonKey;
 /** Key for notification userinfo object for getting the code for the failure */

@@ -15,6 +15,7 @@
 #pragma mark notifcations
 NSString * const HoCPushBoxSDKNotificationSuccess = @"HoCPushBoxSDK.successfull.note";
 NSString * const HoCPushBoxSDKNotificationFailure = @"HoCPushBoxSDK.successfull.note";
+NSString * const HoCPushBoxSDKNotificationMethodKey = @"HoCPushBoxSDK.note.method.key";
 NSString * const HoCPushBoxSDKNotificationFailureReasonKey = @"HoCPushBoxSDK.successfull.note.reason.key";
 NSString * const HoCPushBoxSDKNotificationFailureCodeKey = @"HoCPushBoxSDK.successfull.note.code.key";
 #pragma mark urls
@@ -363,9 +364,11 @@ static NSString *API_SECRET;
  * @param code the code to set
  * @param reason the reason to the error
  */
-- (void) postErrorNotificationWithCode:(HoCPushBoxErrorCode) code andReason:(NSString *) reason
+- (void) postErrorNotificationWithCode:(HoCPushBoxErrorCode) code andReason:(NSString *) reason forMethod:(NSString *) method
 {
-    NSDictionary *dictionary = @{HoCPushBoxSDKNotificationFailureCodeKey : [NSNumber numberWithInteger:code], HoCPushBoxSDKNotificationFailureReasonKey : reason};
+    NSDictionary *dictionary = @{HoCPushBoxSDKNotificationMethodKey : method,
+                                 HoCPushBoxSDKNotificationFailureCodeKey : [NSNumber numberWithInteger:code],
+                                 HoCPushBoxSDKNotificationFailureReasonKey : reason};
     
     [[NSNotificationCenter defaultCenter] postNotificationName:HoCPushBoxSDKNotificationFailure object:nil userInfo:dictionary];
 }
@@ -502,7 +505,7 @@ static NSString *API_SECRET;
     NSData *postData = [NSJSONSerialization dataWithJSONObject:[self finalizeDictionary:dictionary] options:0 error:&serializationError];
     if (serializationError != nil)
     {
-        [self postErrorNotificationWithCode:HoCPushBoxErrorCodeInternalError andReason:@"Could not build request"];
+        [self postErrorNotificationWithCode:HoCPushBoxErrorCodeInternalError andReason:@"Could not build request" forMethod:method];
         return;
     }
 
@@ -530,7 +533,7 @@ static NSString *API_SECRET;
                 else
                 {
                     // Parsing failed - send notification
-                    [self postErrorNotificationWithCode:HoCPushBoxErrorCodeInternalError andReason:@"Could not parse result"];
+                    [self postErrorNotificationWithCode:HoCPushBoxErrorCodeInternalError andReason:@"Could not parse result" forMethod:method];
                 }
                 
             }
@@ -556,7 +559,7 @@ static NSString *API_SECRET;
 - (void) handleConnectionError:(NSError *) connectionError forMethod:(NSString *) method
 {
     NSString *msg = @"Error connecting";
-    [self postErrorNotificationWithCode:HoCPushBoxErrorCodeNetworkError andReason:msg];
+    [self postErrorNotificationWithCode:HoCPushBoxErrorCodeNetworkError andReason:msg forMethod:method];
     
 }
 
@@ -572,7 +575,7 @@ static NSString *API_SECRET;
     if ([[jsonResult valueForKey:HoCPushBoxSDKJSONKeySuccess] boolValue])
     {
         // Success - notify
-        [[NSNotificationCenter defaultCenter] postNotificationName:HoCPushBoxSDKNotificationSuccess object:nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:HoCPushBoxSDKNotificationSuccess object:nil userInfo:@{HoCPushBoxSDKNotificationMethodKey : method}];
         
         // Set token is the only request that returns data and it is not part of the queue, so handle this as a special case
         if ([method isEqualToString:HoCPushBoxSDKMethodSetToken])
@@ -601,12 +604,12 @@ static NSString *API_SECRET;
         if (code == 401)
         {
             // 401 is authorization error - send notification
-            [self postErrorNotificationWithCode:HoCPushBoxErrorCodeAuthorizationError andReason:msg];
+            [self postErrorNotificationWithCode:HoCPushBoxErrorCodeAuthorizationError andReason:msg forMethod:method];
         }
         else
         {
             // Some other kind of error - send notification
-            [self postErrorNotificationWithCode:HoCPushBoxErrorCodeApiError andReason:msg];
+            [self postErrorNotificationWithCode:HoCPushBoxErrorCodeApiError andReason:msg forMethod:method];
         }
     }
 }
