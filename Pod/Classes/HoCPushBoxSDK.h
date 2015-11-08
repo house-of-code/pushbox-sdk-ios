@@ -72,7 +72,6 @@ typedef NS_ENUM(NSUInteger, HoCPushBoxGenderType)
  */
 + (instancetype) sharedInstance;
 
-
 #pragma mark - set profile identifier
 /**
  * Sets profile identifer for the user
@@ -88,6 +87,35 @@ typedef NS_ENUM(NSUInteger, HoCPushBoxGenderType)
  */
 - (void) setDeviceToken:(NSData *) token;
 
+#pragma mark - handle push opens
+/**
+ * Payload handler
+ *
+ * Called when a push is opened returns the payload from cms. Use this payload to do whatever action is required.
+ */
+- (void) registerPayloadHandler:(void (^)(id payload))payloadHandler;
+
+/**
+ * Handle push data when received
+ *
+ * This method needs to be called from application:didReceiveRemoteNotification:
+ */
+- (void) handleRemoteNotification:(NSDictionary*)userInfo;
+
+/**
+ * Handle push data and app state when app is launched from killed state 
+ *
+ * This method needs to be called from application:didFinishLaunchingWithOptions:
+ */
+- (void) handleLaunchingWithOptions:(NSDictionary*)launchOptions;
+
+#pragma mark - stored messages
+
+/**
+ * Returns all stored messages that can be used in an inbox
+ *
+ */
+- (NSArray*) storedMessages;
 
 #pragma mark - send data
 
