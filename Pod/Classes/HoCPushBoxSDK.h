@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
+#import "HoCPushMessage.h"
 #pragma mark - Notications send by the sdk
 /** Notification name when data send successfully */
 extern NSString * const HoCPushBoxSDKNotificationSuccess;
@@ -21,6 +21,8 @@ extern NSString * const HoCPushBoxSDKNotificationFailureReasonKey;
 /** Key for notification userinfo object for getting the code for the failure */
 extern NSString * const HoCPushBoxSDKNotificationFailureCodeKey;
 
+#pragma mark - Payload handler
+typedef void (^PayloadHandlerBlock)(HoCPushMessage *message);
 
 #pragma mark - Error codes
 typedef NS_ENUM(NSUInteger, HoCPushBoxErrorCode)
@@ -49,6 +51,17 @@ typedef NS_ENUM(NSUInteger, HoCPushBoxGenderType)
     HoCPushBoxGenderTypeMale = 2
 };
 
+#pragma mark - Verbosity
+typedef NS_ENUM(NSUInteger, HoCPushBoxVerbosity)
+{
+    HoCPushBoxVerbosityNone = 0,
+    HoCPushBoxVerbosityFatals = 1,
+    HoCPushBoxVerbosityErrors = 2,
+    HoCPushBoxVerbosityInfo = 3,
+    HoCPushBoxVerbosityDebug = 4
+};
+
+
 @interface HoCPushBoxSDK : NSObject
 
 #pragma mark - initialization of the sdk
@@ -63,6 +76,7 @@ typedef NS_ENUM(NSUInteger, HoCPushBoxGenderType)
  **/
 + (void) setApiKey:(NSString *) apiKey andSecret:(NSString *) secret;
 
++ (void) setVerbosity:(HoCPushBoxVerbosity) verbosity;
 
 #pragma mark - shared instance
 /**
@@ -93,7 +107,7 @@ typedef NS_ENUM(NSUInteger, HoCPushBoxGenderType)
  *
  * Called when a push is opened returns the payload from cms. Use this payload to do whatever action is required.
  */
-- (void) registerPayloadHandler:(void (^)(id payload))payloadHandler;
+- (void) registerPayloadHandler:(PayloadHandlerBlock) payloadHandler;
 
 /**
  * Handle push data when received
@@ -115,7 +129,7 @@ typedef NS_ENUM(NSUInteger, HoCPushBoxGenderType)
  * Returns all stored messages that can be used in an inbox
  *
  */
-- (NSArray*) storedMessages;
+- (void) storedMessagesWithCompletionHandler:(void (^)(NSArray *messages)) handler;
 
 #pragma mark - send data
 

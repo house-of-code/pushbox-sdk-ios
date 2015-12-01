@@ -9,9 +9,8 @@
 #import "HoCPushBoxSDK.h"
 #import "HoCPushBoxReachability.h"
 #import "NSString+HMAC.h"
-
-
-#pragma mark - string constants
+#import "HoCPushMessage.h"
+#import <UIKit/UIApplication.h>
 #pragma mark notifcations
 NSString * const HoCPushBoxSDKNotificationSuccess = @"HoCPushBoxSDK.successfull.note";
 NSString * const HoCPushBoxSDKNotificationFailure = @"HoCPushBoxSDK.successfull.note";
@@ -25,7 +24,7 @@ NSString * const HoCPushBoxSDKHost = @"api.pushboxsdk.com";
 NSString * const HoCPushBoxSDKJSONKeyHMAC = @"hmac";
 NSString * const HoCPushBoxSDKJSONKeyTS = @"ts";
 NSString * const HoCPushBoxSDKJSONKeyApiKey = @"app_key";
-NSString * const HoCPushBoxSDKJSONKeyToken = @"token";
+NSString * const HoCPushBoxSDKJSONKeyToken = @"push_token";
 NSString * const HoCPushBoxSDKJSONKeyUid = @"uid";
 NSString * const HoCPushBoxSDKJSONKeyProfileId = @"profile_identifier";
 NSString * const HoCPushBoxSDKJSONKeyPlatform = @"platform";
@@ -39,7 +38,9 @@ NSString * const HoCPushBoxSDKJSONKeyLocationLatitude = @"latitude";
 NSString * const HoCPushBoxSDKJSONKeyLocationLongitude = @"longitude";
 NSString * const HoCPushBoxSDKJSONKeySuccess = @"success";
 NSString * const HoCPushBoxSDKJSONKeyMessage = @"message";
-
+NSString * const HoCPushBoxSDKJSONKeyMessages = @"messages";
+NSString * const HoCPushBoxSDKJSONKeyPushId = @"push_id";
+NSString * const HoCPushBoxSDKJSONKeyPushReadTime = @"read_datetime";
 #pragma mark api methods
 NSString * const HoCPushBoxSDKMethodSetToken = @"set_token";
 NSString * const HoCPushBoxSDKMethodSetAge = @"set_age";
@@ -48,7 +49,8 @@ NSString * const HoCPushBoxSDKMethodLogEvent = @"log_event";
 NSString * const HoCPushBoxSDKMethodLogLocation = @"log_location";
 NSString * const HoCPushBoxSDKMethodSetGender = @"set_gender";
 NSString * const HoCPushBoxSDKMethodSetChannels = @"set_channels";
-
+NSString * const HoCPushBoxSDKMethodPushInteracted = @"push_interaction";
+NSString * const HoCPushBoxSDKMethodInbox = @"inbox";
 #pragma mark JSON values
 NSString * const HoCPushBoxSDKJSONValuePlatform = @"iOS";
 
@@ -68,6 +70,8 @@ static NSString *API_KEY;
 /** Holds the Api secret */
 static NSString *API_SECRET;
 
+/** Holds the verbosity level */
+static HoCPushBoxVerbosity VERBOSITY;
 
 #pragma mark - properties definition
 @interface HoCPushBoxSDK ()
@@ -97,6 +101,8 @@ static NSString *API_SECRET;
 #pragma mark timestamp
 @property (nonatomic, readonly) long timestamp;
 
+@property (nonatomic, strong) PayloadHandlerBlock payloadHandler;
+
 @end
 
 @implementation HoCPushBoxSDK
@@ -111,7 +117,7 @@ static NSString *API_SECRET;
         self.netStatus = [HoCPushBoxReachability reachabilityWithHostName:HoCPushBoxSDKHost];
         [self.netStatus startNotifier];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reachabilityChanged:) name:HoCPushBoxReachabilityChangedNotification object:nil];
-
+        
     }
     return self;
 }
@@ -139,6 +145,14 @@ static NSString *API_SECRET;
     API_KEY = apiKey;
     API_SECRET = secret;
 }
+
+#pragma mark - Set verbosity level
+
++ (void) setVerbosity:(HoCPushBoxVerbosity)verbosity
+{
+    VERBOSITY = verbosity;
+}
+
 
 #pragma mark - set profile identifier
 - (void) setProfileIdentifier:(NSString *)profileIdentifier
@@ -226,25 +240,109 @@ static NSString *API_SECRET;
 
 - (void) handleRemoteNotification:(NSDictionary*)userInfo
 {
-  // TODO
+    [self handlePushInteraction:userInfo];
 }
 
 - (void) handleLaunchingWithOptions:(NSDictionary*)launchOptions
 {
-  // TODO
+    NSDictionary *userInfo = [launchOptions valueForKey:UIApplicationLaunchOptionsRemoteNotificationKey];
+    if (userInfo)
+    {
+        [self handlePushInteraction:userInfo];
+    }
 }
 
-- (void) registerPayloadHandler:(void (^)(id payload))payloadHandler
+- (void) registerPayloadHandler:(PayloadHandlerBlock) payloadHandler
 {
-  // TODO
+    self.payloadHandler = payloadHandler;
+}
+
+- (void) handlePushInteraction:(NSDictionary *) payload
+{
+    HoCPushMessage *msg = [[HoCPushMessage alloc] initWithJson:payload];
+    if (msg)
+    {
+        self.payloadHandler(msg);
+        NSLog(@"Message: %@", msg);
+        NSMutableDictionary *dict = self.defaultDictionary;
+        [dict setObject:[NSNumber numberWithInteger:msg.pushId] forKey:HoCPushBoxSDKJSONKeyPushId];
+        
+        NSDateFormatter *formatter = [NSDateFormatter new];
+        [formatter setDateFormat:@"yyyy/MM/dd HH:mm:SS"];
+        
+        NSString *date = [formatter stringFromDate:[NSDate date]];
+        [dict setObject:date forKey:HoCPushBoxSDKJSONKeyPushReadTime];
+        [self addDictionary:dict toQueueForMethod:HoCPushBoxSDKMethodPushInteracted];
+
+    }
 }
 
 #pragma mark - stored messages
 
-- (NSArray*) storedMessages
+- (void) storedMessagesWithCompletionHandler:(void (^)(NSArray *messages)) handler;
 {
-  // TODO
-  return [NSArray new]; 
+    if (![self isReady])
+    {
+        handler(nil);
+        return;
+    }
+    NSError *serializationError;
+    NSData *postData = [NSJSONSerialization dataWithJSONObject:[self finalizeDictionary:self.defaultDictionary] options:0 error:&serializationError];
+    if (serializationError != nil)
+    {
+        [self postErrorNotificationWithCode:HoCPushBoxErrorCodeInternalError andReason:@"Could not build request" forMethod:HoCPushBoxSDKMethodInbox];
+        if (VERBOSITY > HoCPushBoxVerbosityNone)
+        {
+            NSLog(@"HoCPushBoxSDK: Error could build request for: 'get inbox'");
+        }
+        return;
+    }
+    
+    // Setup the network task
+    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:[self requestWithPostData:postData andMethod:HoCPushBoxSDKMethodInbox] completionHandler:^(NSData *data, NSURLResponse *response, NSError *connectionError) {
+        NSInteger code = ((NSHTTPURLResponse *)response).statusCode;
+        NSMutableArray *inbox = [NSMutableArray new];
+        if (connectionError)
+        {
+            // Error connecting - send error message
+            [self handleConnectionError:connectionError forMethod:HoCPushBoxSDKMethodInbox];
+        }
+        else
+        {
+            // Connection whent fine - check result
+            if ([data length] > 0)
+            {
+                // Data returned from api - parse it
+                NSError *parseError = nil;
+                NSDictionary *dictionary = [NSJSONSerialization JSONObjectWithData:data options:0 error:&parseError];
+                if (!parseError)
+                {
+                    // Parsing went fine - handle the result
+                    NSArray *arr = [dictionary valueForKey:HoCPushBoxSDKJSONKeyMessages];
+                    for (NSDictionary *dict in arr)
+                    {
+                        HoCPushMessage *msg = [[HoCPushMessage alloc] initWithJson:dict];
+                        NSLog(@"Message: %@", msg);
+                        [inbox addObject:msg];
+                    }
+                }
+                else
+                {
+                    // Parsing failed - send notification
+                    [self postErrorNotificationWithCode:HoCPushBoxErrorCodeInternalError andReason:@"Could not parse result" forMethod:HoCPushBoxSDKMethodInbox];
+                    if (VERBOSITY > HoCPushBoxVerbosityNone)
+                    {
+                        NSLog(@"HoCPushBoxSDK: Error could not parse result for method: 'get inbox");
+                    }
+                }
+                
+            }
+        }
+        handler(inbox);
+    }];
+    
+    // Start the task.
+    [task resume];
 }
 
 #pragma mark - private properties
@@ -296,11 +394,21 @@ static NSString *API_SECRET;
     
     if (!self.isInitialized || !self.token)
     {
+        if (VERBOSITY >= HoCPushBoxVerbosityInfo)
+        {
+            NSLog(@"Not initialized or token not set");
+        }
+        
         return NO;
     }
-
+    
     if ([self.netStatus currentReachabilityStatus] == HoCPushBoxNetworkStatusNotReachable)
     {
+        if (VERBOSITY >= HoCPushBoxVerbosityInfo)
+        {
+            NSLog(@"No network connection");
+        }
+
         return NO;
     }
     return YES;
@@ -314,7 +422,7 @@ static NSString *API_SECRET;
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithDictionary:@{HoCPushBoxSDKJSONKeyApiKey : API_KEY, HoCPushBoxSDKJSONKeyPlatform : HoCPushBoxSDKJSONValuePlatform, HoCPushBoxSDKJSONKeyOccurenceTimestamp : [NSNumber numberWithLong:[now timeIntervalSinceNow]]}];
     if (self.profileIdentifier)
     {
-        [dict setObject:self.token forKey:HoCPushBoxSDKJSONKeyProfileId];
+        [dict setObject:self.profileIdentifier forKey:HoCPushBoxSDKJSONKeyProfileId];
     }
     return dict;
 }
@@ -369,7 +477,7 @@ static NSString *API_SECRET;
     long timestamp = self.timestamp;
     NSString *hmac = [self hmacForTimestamp:timestamp];
     NSNumber *ts = [NSNumber numberWithLong:timestamp];
-
+    
     NSMutableDictionary *dict = [dictionary mutableCopy];
     [dict setObject:ts forKey:HoCPushBoxSDKJSONKeyTS];
     [dict setObject:hmac forKey:HoCPushBoxSDKJSONKeyHMAC];
@@ -442,6 +550,7 @@ static NSString *API_SECRET;
     
     [self.sdkDefaults setObject:queue forKey:HoCPushBoxSDKDefaultsQueue];
     [self.sdkDefaults synchronize];
+    [self outputCommand:method dictionary:dictionary];
     [self takeNext];
 }
 
@@ -491,13 +600,17 @@ static NSString *API_SECRET;
     }
     // Lock
     self.working = YES;
-
     // Check if token is send to the api
     if (!self.isTokenSend)
     {
+        NSLog(@"Token not set");
         // The device token is not send to the api yet - do it before taking any jobs from the queue
         NSMutableDictionary *requestDict = self.defaultDictionary;
         [requestDict setValue:self.token forKey:HoCPushBoxSDKJSONKeyToken];
+        if (VERBOSITY >= HoCPushBoxVerbosityInfo)
+        {
+            NSLog(@"HoCPushBoxSDK: Sends token: %@", self.token);
+        }
         [self handleRequestForMethod:HoCPushBoxSDKMethodSetToken withDictionary:requestDict];
     }
     else
@@ -513,6 +626,10 @@ static NSString *API_SECRET;
                 // Only send if uid is set
                 [self handleRequestForMethod:method withDictionary:jsonDict];
             }
+        }
+        else
+        {
+            self.working = NO;
         }
     }
 }
@@ -531,9 +648,13 @@ static NSString *API_SECRET;
     if (serializationError != nil)
     {
         [self postErrorNotificationWithCode:HoCPushBoxErrorCodeInternalError andReason:@"Could not build request" forMethod:method];
+        if (VERBOSITY > HoCPushBoxVerbosityNone)
+        {
+            NSLog(@"HoCPushBoxSDK: Error could not parse result for method: '%@'", method);
+        }
         return;
     }
-
+    
     // Setup the network task
     NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:[self requestWithPostData:postData andMethod:method] completionHandler:^(NSData *data, NSURLResponse *response, NSError *connectionError) {
         NSInteger code = ((NSHTTPURLResponse *)response).statusCode;
@@ -559,6 +680,10 @@ static NSString *API_SECRET;
                 {
                     // Parsing failed - send notification
                     [self postErrorNotificationWithCode:HoCPushBoxErrorCodeInternalError andReason:@"Could not parse result" forMethod:method];
+                    if (VERBOSITY > HoCPushBoxVerbosityNone)
+                    {
+                        NSLog(@"HoCPushBoxSDK: Error could not parse result for method: '%@'", method);
+                    }
                 }
                 
             }
@@ -571,12 +696,12 @@ static NSString *API_SECRET;
     
     // Start the task.
     [task resume];
-
+    
 }
 
 
 #pragma result handling
-/** 
+/**
  * Send notification with connection error
  * @param connectionError - error
  * @param method method that failed
@@ -585,6 +710,10 @@ static NSString *API_SECRET;
 {
     NSString *msg = @"Error connecting";
     [self postErrorNotificationWithCode:HoCPushBoxErrorCodeNetworkError andReason:msg forMethod:method];
+    if (VERBOSITY > HoCPushBoxVerbosityFatals)
+    {
+        NSLog(@"HoCPushBoxSDK: Error connecting: '%@' for method: '%@'", msg, method);
+    }
     
 }
 
@@ -636,9 +765,21 @@ static NSString *API_SECRET;
             // Some other kind of error - send notification
             [self postErrorNotificationWithCode:HoCPushBoxErrorCodeApiError andReason:msg forMethod:method];
         }
+        if (VERBOSITY > HoCPushBoxVerbosityFatals)
+        {
+            NSLog(@"HoCPushBoxSDK: Error: '%@' for method: '%@'", msg, method);
+        }
+
     }
 }
 
 
+- (void) outputCommand:(NSString *) method dictionary:(NSDictionary *) dictionary
+{
+    if (VERBOSITY > HoCPushBoxVerbosityInfo)
+    {
+        NSLog(@"HocPushBoxSDK: Send '%@' with values: %@", method, dictionary);
+    }
+}
 
 @end
