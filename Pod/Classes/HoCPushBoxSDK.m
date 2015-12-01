@@ -262,8 +262,10 @@ static HoCPushBoxVerbosity VERBOSITY;
     HoCPushMessage *msg = [[HoCPushMessage alloc] initWithJson:payload];
     if (msg)
     {
-        self.payloadHandler(msg);
-        NSLog(@"Message: %@", msg);
+        if (self.payloadHandler)
+        {
+          self.payloadHandler(msg);
+        }
         NSMutableDictionary *dict = self.defaultDictionary;
         [dict setObject:[NSNumber numberWithInteger:msg.pushId] forKey:HoCPushBoxSDKJSONKeyPushId];
         
