@@ -283,7 +283,7 @@ static HoCPushBoxVerbosity VERBOSITY;
 
 - (void) storedMessagesWithCompletionHandler:(void (^)(NSArray *messages)) handler;
 {
-    if (![self isReady])
+    if (![self isInitialized])
     {
         handler(nil);
         return;
@@ -297,6 +297,7 @@ static HoCPushBoxVerbosity VERBOSITY;
         {
             NSLog(@"HoCPushBoxSDK: Error could build request for: 'get inbox'");
         }
+        handler(nil);
         return;
     }
     
