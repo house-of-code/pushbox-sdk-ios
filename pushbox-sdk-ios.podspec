@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "pushbox-sdk-ios"
-  s.version          = "0.1.6"
+  s.version          = "0.1.7"
   s.summary          = "PushBoxSDK ios version. Simplified access to the PushBoxSDK api"
 
 # This description is used to generate tags and improve search results.
