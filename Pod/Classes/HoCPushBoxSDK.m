@@ -300,7 +300,6 @@ static HoCPushBoxVerbosity VERBOSITY;
     
     // Setup the network task
     NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:[self requestWithPostData:postData andMethod:HoCPushBoxSDKMethodInbox] completionHandler:^(NSData *data, NSURLResponse *response, NSError *connectionError) {
-        NSInteger code = ((NSHTTPURLResponse *)response).statusCode;
         NSMutableArray *inbox = [NSMutableArray new];
         if (connectionError)
         {

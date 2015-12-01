@@ -100,7 +100,7 @@ NSString * const HoCPushJsonKeyTitle = @"title";
 - (NSString *) description
 {
     return [NSString stringWithFormat:@"%ld:'%@'. Recived: %@. Interaction date: %@. Expiration date: %@. Message: '%@'. Payload: %@",
-            self.pushId,
+            (long)self.pushId,
             self.title,
             self.receiveDate,
             self.interactionDate,
