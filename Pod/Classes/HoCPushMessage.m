@@ -13,6 +13,7 @@ NSString * const HoCPushMessageMessageKey = @"push.message.message";
 NSString * const HoCPushMessageReceivedDateKey = @"push.message.date.received";
 NSString * const HoCPushMessageExpirationDateKey = @"push.message.date.expiration";
 NSString * const HoCPushMessageInteractionDateKey = @"push.message.date.interacted";
+NSString * const HoCPushMessageHandledDateKey = @"push.message.date.handled";
 NSString * const HoCPushMessagePayloadKey = @"push.message.payload";
 NSString * const HoCPushMessagePushIdKey = @"push.message.push.id";
 
@@ -22,6 +23,7 @@ NSString * const HoCPushJsonKeyMessageId = @"id";
 NSString * const HoCPushJsonKeyMessage = @"message";
 NSString * const HoCPushJsonKeyPayload = @"payload";
 NSString * const HoCPushJsonKeyReadDateTime = @"read_datetime";
+NSString * const HoCPushJsonKeyHandledDateTime = @"handled_datetime";
 NSString * const HoCPushJsonKeyTitle = @"title";
 
 @implementation HoCPushMessage
@@ -33,6 +35,7 @@ NSString * const HoCPushJsonKeyTitle = @"title";
     [coder encodeObject:self.message forKey:HoCPushMessageMessageKey];
     [coder encodeObject:self.receiveDate forKey:HoCPushMessageReceivedDateKey];
     [coder encodeObject:self.interactionDate forKey:HoCPushMessageInteractionDateKey];
+    [coder encodeObject:self.handledDate forKey:HoCPushMessageHandledDateKey];
     [coder encodeObject:self.payload forKey:HoCPushMessagePayloadKey];
     [coder encodeInteger:self.pushId forKey:HoCPushMessagePushIdKey];
 }
@@ -46,6 +49,7 @@ NSString * const HoCPushJsonKeyTitle = @"title";
         self.message = [coder decodeObjectForKey:HoCPushMessageMessageKey];
         self.receiveDate = [coder decodeObjectForKey:HoCPushMessageReceivedDateKey];
         self.interactionDate = [coder decodeObjectForKey:HoCPushMessageInteractionDateKey];
+        self.handledDate = [coder decodeObjectForKey:HoCPushMessageHandledDateKey];
         self.payload = [coder decodeObjectForKey:HoCPushMessagePayloadKey];
         self.pushId = [coder decodeIntegerForKey:HoCPushMessagePushIdKey];
     }
@@ -78,6 +82,12 @@ NSString * const HoCPushJsonKeyTitle = @"title";
             date = nil;
         }
         self.interactionDate = [df dateFromString:date];
+        date = [json valueForKey:HoCPushJsonKeyHandledDateTime];
+        if ([date isKindOfClass:[NSNull class]])
+        {
+            date = nil;
+        }
+        self.handledDate = [df dateFromString:date];
         date = [json valueForKey:HoCPushJsonKeyExpirationDate];
         if ([date isKindOfClass:[NSNull class]])
         {
@@ -99,11 +109,12 @@ NSString * const HoCPushJsonKeyTitle = @"title";
 
 - (NSString *) description
 {
-    return [NSString stringWithFormat:@"%ld:'%@'. Recived: %@. Interaction date: %@. Expiration date: %@. Message: '%@'. Payload: %@",
+    return [NSString stringWithFormat:@"%ld:'%@'. Recived: %@. Interaction date: %@. Handled date: %@.Expiration date: %@. Message: '%@'. Payload: %@",
             (long)self.pushId,
             self.title,
             self.receiveDate,
             self.interactionDate,
+            self.handledDate,
             self.expirationDate,
             self.message,
             self.payload];

@@ -106,6 +106,7 @@ typedef NS_ENUM(NSUInteger, HoCPushBoxVerbosity)
  * Payload handler
  *
  * Called when a push is opened returns the payload from cms. Use this payload to do whatever action is required.
+ * @param payloadHandler block with the signature (^PayloadHandlerBlock)(HoCPushMessage *message)
  */
 - (void) registerPayloadHandler:(PayloadHandlerBlock) payloadHandler;
 
@@ -113,6 +114,7 @@ typedef NS_ENUM(NSUInteger, HoCPushBoxVerbosity)
  * Handle push data when received
  *
  * This method needs to be called from application:didReceiveRemoteNotification:
+ * @param userInfo user info from application:didReceiveRemoteNotification:
  */
 - (void) handleRemoteNotification:(NSDictionary*)userInfo;
 
@@ -120,8 +122,17 @@ typedef NS_ENUM(NSUInteger, HoCPushBoxVerbosity)
  * Handle push data and app state when app is launched from killed state 
  *
  * This method needs to be called from application:didFinishLaunchingWithOptions:
+ * @param launchOptions options from application:didFinishLaunchingWithOptions:
  */
 - (void) handleLaunchingWithOptions:(NSDictionary*)launchOptions;
+
+/**
+ * Mark messageas read
+ *
+ * @param message the message to mark as read
+ */
+- (void) readMessage:(HoCPushMessage *) message;
+
 
 #pragma mark - stored messages
 

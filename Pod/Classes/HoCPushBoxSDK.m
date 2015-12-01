@@ -50,6 +50,7 @@ NSString * const HoCPushBoxSDKMethodLogLocation = @"log_location";
 NSString * const HoCPushBoxSDKMethodSetGender = @"set_gender";
 NSString * const HoCPushBoxSDKMethodSetChannels = @"set_channels";
 NSString * const HoCPushBoxSDKMethodPushInteracted = @"push_interaction";
+NSString * const HoCPushBoxSDKMethodPushRead = @"push_read";
 NSString * const HoCPushBoxSDKMethodInbox = @"inbox";
 #pragma mark JSON values
 NSString * const HoCPushBoxSDKJSONValuePlatform = @"iOS";
@@ -279,17 +280,32 @@ static HoCPushBoxVerbosity VERBOSITY;
     }
 }
 
+- (void) readMessage:(HoCPushMessage *) message
+{
+    NSMutableDictionary *dict = self.defaultDictionary;
+    [dict setObject:[NSNumber numberWithInteger:message.pushId] forKey:HoCPushBoxSDKJSONKeyPushId];
+    
+    NSDateFormatter *formatter = [NSDateFormatter new];
+    [formatter setDateFormat:@"yyyy/MM/dd HH:mm:SS"];
+    
+    NSString *date = [formatter stringFromDate:[NSDate date]];
+    [dict setObject:date forKey:HoCPushBoxSDKJSONKeyPushReadTime];
+    [self addDictionary:dict toQueueForMethod:HoCPushBoxSDKMethodPushRead];
+}
+
 #pragma mark - stored messages
 
 - (void) storedMessagesWithCompletionHandler:(void (^)(NSArray *messages)) handler;
 {
-    if (![self isInitialized])
+    if (![self isReady])
     {
-        handler(nil);
+        [self performSelector:@selector(storedMessagesWithCompletionHandler:) withObject:handler afterDelay:1];
         return;
     }
     NSError *serializationError;
-    NSData *postData = [NSJSONSerialization dataWithJSONObject:[self finalizeDictionary:self.defaultDictionary] options:0 error:&serializationError];
+    NSDictionary *dict =[self finalizeDictionary:self.defaultDictionary];
+    NSLog(@"Dict: %@", dict);
+    NSData *postData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:&serializationError];
     if (serializationError != nil)
     {
         [self postErrorNotificationWithCode:HoCPushBoxErrorCodeInternalError andReason:@"Could not build request" forMethod:HoCPushBoxSDKMethodInbox];
@@ -297,7 +313,10 @@ static HoCPushBoxVerbosity VERBOSITY;
         {
             NSLog(@"HoCPushBoxSDK: Error could build request for: 'get inbox'");
         }
-        handler(nil);
+        dispatch_queue_t mainThreadQueue = dispatch_get_main_queue();
+        dispatch_async(mainThreadQueue, ^{
+            handler(nil);
+        });
         return;
     }
     
@@ -340,7 +359,11 @@ static HoCPushBoxVerbosity VERBOSITY;
                 
             }
         }
-        handler(inbox);
+        dispatch_queue_t mainThreadQueue = dispatch_get_main_queue();
+        dispatch_async(mainThreadQueue, ^{
+            handler(inbox);
+        });
+
     }];
     
     // Start the task.
